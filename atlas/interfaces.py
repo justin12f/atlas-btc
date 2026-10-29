@@ -137,7 +137,8 @@ class MarketData(Protocol):
 class Broker(Protocol):
     mode: str
 
-    def execute(self, plan: OrderPlan, market: SpotMarket, cloid: str) -> ExecutionResult: ...
+    def execute(self, plan: OrderPlan, market: SpotMarket, cloid: str,
+                ref_close: float | None = None) -> ExecutionResult: ...
 
 
 @runtime_checkable
