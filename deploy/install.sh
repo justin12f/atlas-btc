@@ -11,6 +11,8 @@ ETC=/etc/atlas
 need() { command -v "$1" >/dev/null || { echo "falta $1"; exit 1; }; }
 need python3; need git; need systemctl
 python3 -c 'import sys; assert sys.version_info >= (3, 11), "se requiere Python >= 3.11"'
+PYV="$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')"
+python3 -c 'import ensurepip' 2>/dev/null || { apt-get update -q && apt-get install -y -q "python$PYV-venv"; }
 command -v sqlite3 >/dev/null || { apt-get update -q && apt-get install -y -q sqlite3; }
 # Reloj: basta con que esté sincronizado (timesyncd o chrony)
 timedatectl show -p NTPSynchronized --value | grep -qx yes || echo "AVISO: reloj no sincronizado (timedatectl)"
