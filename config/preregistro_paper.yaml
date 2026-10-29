@@ -6,12 +6,12 @@ fecha_aprobacion: null
 
 estrategia:
   config: config/strategy.yaml          # bloqueada; su sha256 queda en cada fila de `signals`
-  strategy_sha256: null                 # se llena al aprobar (python -c "from atlas.config import strategy_hash; print(strategy_hash())")
-  codigo_git: null                      # commit con el que arranca el día 1
+  strategy_sha256: c74e2828ddb391608e5d1873059a2554d8e5ec916918b6d94f0cf891c0e06019   # se verifica al aprobar (python -c "from atlas.config import strategy_hash; print(strategy_hash())")
+  codigo_git: 47a7c03                   # commit instalado en el VPS el 2026-10-29
   ml: apagado
 
 periodo:
-  dia_1: null                           # primer día UTC tras aprobar F5 (7 días desatendidos)
+  dia_1: "2026-10-29"                    # decisión al cierre del 29, ejecutada 2026-10-30 00:05 UTC (Justin decidió arrancar sin esperar F5)
   revisiones_meses: [3, 6, 12]
   sin_cambios_de_parametros: true
 
@@ -42,5 +42,7 @@ rendimiento:                            # solo informativo
 
 sombras:
   stablecoins: {regla: engine/shadow.py, evaluacion: "2027-10-25"}
+
+infra: {vps: "Hostinger srv1998577, Ubuntu 24.04, Python 3.12", region: "US (solo lectura de datos públicos en papel)"}
 
 despues_de_12_meses: "documento aparte (Términos HL para México, región VPS, custodia UBTC/puente USDC, capital escalonado)"
