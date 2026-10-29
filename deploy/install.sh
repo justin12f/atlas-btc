@@ -11,9 +11,9 @@ ETC=/etc/atlas
 need() { command -v "$1" >/dev/null || { echo "falta $1"; exit 1; }; }
 need python3; need git; need systemctl
 python3 -c 'import sys; assert sys.version_info >= (3, 11), "se requiere Python >= 3.11"'
-if ! command -v sqlite3 >/dev/null || ! command -v chronyd >/dev/null; then
-  apt-get update -q && apt-get install -y -q sqlite3 chrony
-fi
+command -v sqlite3 >/dev/null || { apt-get update -q && apt-get install -y -q sqlite3; }
+# Reloj: basta con que esté sincronizado (timesyncd o chrony)
+timedatectl show -p NTPSynchronized --value | grep -qx yes || echo "AVISO: reloj no sincronizado (timedatectl)"
 
 # Usuario de sistema sin shell de login ni sudo
 id atlas >/dev/null 2>&1 || useradd --system --home-dir "$DATA" --shell /usr/sbin/nologin atlas

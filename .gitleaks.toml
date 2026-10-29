@@ -1,0 +1,8 @@
+# Reglas por defecto + excepción: respuestas públicas de la API de Hyperliquid grabadas en F0.
+# Sus tokenId y direcciones de contratos son identificadores públicos, no secretos.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "fixtures públicas de spotMeta"
+paths = ['''tests/fixtures/hl/spot_meta.*\.json''']
