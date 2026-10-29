@@ -1,0 +1,60 @@
+# Estrategia "Atlas" BTC/USDC v3 — 2026-10-25.
+# Cambios contra v2 (config/strategy_v2.yaml), decididos con el grid de 384 permutaciones
+# y el protocolo de config/preregistro_v3.yaml:
+#   - Se quita la capa de ML en sombra con promocion (efecto nulo, no significativo).
+#   - Se agrega interruptor de pausa por caida en vivo (36% = 1.5x la peor caida del backtest).
+#   - Filtro de stablecoins solo en sombra (se registra, no opera).
+# Todo lo demas queda igual que v2.
+version: "3.0"
+
+periods:
+  train_start: "2014-06-01"
+  dev_start: "2018-01-01"
+  dev_end: "2025-10-22"
+  holdout_start: "2025-10-23"
+  holdout_end: "2026-10-22"
+
+trend:                            # mediano plazo: 8 senales clasicas, sin parametros ajustados
+  signals: [sma50, sma100, sma200, mom30, mom90, mom180, donchian55_20, ema20_100]
+
+risk:
+  target_vol: 0.40
+  vol_halflife: 10
+  band: 0.10
+  dd_brake: false
+  kill_switch_dd: 0.36            # pausa (todo a USDC) si la caida en vivo supera 36%; reanudar requiere revision manual
+  kill_switch_review_days: 30     # en el backtest, la revision se modela como 30 dias en USDC
+
+cycle:                            # largo plazo (hipotesis; revisar antes del halving de 2028)
+  enabled: true
+  bear_window_days: [540, 900]
+  multiplier: 0.5
+
+ml:
+  enabled: false                  # v3: fuera del flujo de produccion; el codigo queda para investigacion
+  horizon: 28
+  retrain_days: 91
+  automl: true
+  optuna_trials: 8
+  gate_auc: 0.52
+  mode: shadow_promotion
+  promotion_window_days: 365
+  promotion_threshold: 0.02
+  promotion_weight: 1.0
+  ml_blend: 0.5
+
+shadow:                           # senales que se registran sin operar
+  stablecoin_filter:
+    enabled: true
+    rule: "exposicion x 0.5 si log(oferta USDT+USDC) cae en 30 dias (rezago 2 dias)"
+    evaluate_on: "2027-10-25"
+    criterion: "mismo protocolo de preregistro_v3: IC95% del efecto > 0 y no peor en el periodo en vivo"
+
+execution:
+  venue: binance_spot
+  pair: BTCUSDC
+  fee: 0.0010
+  slippage: 0.0003
+  usdc_apy_base: 0.0
+  usdc_apy_sensitivity: 0.04
+  decision_time_utc: "00:00"

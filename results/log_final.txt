@@ -1,0 +1,103 @@
+2018-01-01  n= 1281  lgbm_fixed=0.506  lgbm_optuna=0.558  extratrees=0.591  logit=0.708  -> logit
+2018-04-02  n= 1372  lgbm_fixed=0.421  lgbm_optuna=0.575  extratrees=0.606  logit=0.668  -> logit
+2018-07-02  n= 1463  lgbm_fixed=0.548  lgbm_optuna=0.553  extratrees=0.533  logit=0.591  -> logit
+2018-10-01  n= 1554  lgbm_fixed=0.636  lgbm_optuna=0.622  extratrees=0.674  logit=0.721  -> logit
+2018-12-31  n= 1645  lgbm_fixed=0.491  lgbm_optuna=0.571  extratrees=0.537  logit=0.645  -> logit
+2019-04-01  n= 1736  lgbm_fixed=0.451  lgbm_optuna=0.578  extratrees=0.536  logit=0.617  -> logit
+2019-07-01  n= 1827  lgbm_fixed=0.580  lgbm_optuna=0.621  extratrees=0.560  logit=0.545  -> lgbm_optuna
+2019-09-30  n= 1918  lgbm_fixed=0.614  lgbm_optuna=0.633  extratrees=0.662  logit=0.595  -> extratrees
+2019-12-30  n= 2009  lgbm_fixed=0.561  lgbm_optuna=0.570  extratrees=0.442  logit=0.615  -> logit
+2020-03-30  n= 2100  lgbm_fixed=0.482  lgbm_optuna=0.560  extratrees=0.435  logit=0.599  -> logit
+2020-06-29  n= 2191  lgbm_fixed=0.580  lgbm_optuna=0.623  extratrees=0.504  logit=0.572  -> lgbm_optuna
+2020-09-28  n= 2282  lgbm_fixed=0.582  lgbm_optuna=0.577  extratrees=0.545  logit=0.513  -> lgbm_fixed
+2020-12-28  n= 2373  lgbm_fixed=0.561  lgbm_optuna=0.556  extratrees=0.395  logit=0.544  -> lgbm_fixed
+2021-03-29  n= 2464  lgbm_fixed=0.485  lgbm_optuna=0.565  extratrees=0.345  logit=0.459  -> lgbm_optuna
+2021-06-28  n= 2555  lgbm_fixed=0.604  lgbm_optuna=0.676  extratrees=0.496  logit=0.499  -> lgbm_optuna
+2021-09-27  n= 2646  lgbm_fixed=0.511  lgbm_optuna=0.586  extratrees=0.479  logit=0.464  -> lgbm_optuna
+2021-12-27  n= 2737  lgbm_fixed=0.536  lgbm_optuna=0.619  extratrees=0.356  logit=0.491  -> lgbm_optuna
+2022-03-28  n= 2828  lgbm_fixed=0.535  lgbm_optuna=0.599  extratrees=0.349  logit=0.455  -> lgbm_optuna
+2022-06-27  n= 2919  lgbm_fixed=0.603  lgbm_optuna=0.641  extratrees=0.441  logit=0.540  -> lgbm_optuna
+2022-09-26  n= 3010  lgbm_fixed=0.572  lgbm_optuna=0.613  extratrees=0.456  logit=0.582  -> lgbm_optuna
+2022-12-26  n= 3101  lgbm_fixed=0.563  lgbm_optuna=0.605  extratrees=0.413  logit=0.570  -> lgbm_optuna
+2023-03-27  n= 3192  lgbm_fixed=0.634  lgbm_optuna=0.676  extratrees=0.538  logit=0.464  -> lgbm_optuna
+2023-06-26  n= 3283  lgbm_fixed=0.660  lgbm_optuna=0.713  extratrees=0.577  logit=0.529  -> lgbm_optuna
+2023-09-25  n= 3374  lgbm_fixed=0.605  lgbm_optuna=0.636  extratrees=0.545  logit=0.573  -> lgbm_optuna
+2023-12-25  n= 3465  lgbm_fixed=0.615  lgbm_optuna=0.623  extratrees=0.457  logit=0.585  -> lgbm_optuna
+2024-03-25  n= 3556  lgbm_fixed=0.699  lgbm_optuna=0.699  extratrees=0.601  logit=0.592  -> lgbm_fixed
+2024-06-24  n= 3647  lgbm_fixed=0.705  lgbm_optuna=0.718  extratrees=0.655  logit=0.633  -> lgbm_optuna
+2024-09-23  n= 3738  lgbm_fixed=0.696  lgbm_optuna=0.714  extratrees=0.548  logit=0.658  -> lgbm_optuna
+2024-12-23  n= 3829  lgbm_fixed=0.690  lgbm_optuna=0.688  extratrees=0.596  logit=0.618  -> lgbm_fixed
+2025-03-24  n= 3920  lgbm_fixed=0.710  lgbm_optuna=0.715  extratrees=0.646  logit=0.590  -> lgbm_optuna
+2025-06-23  n= 4011  lgbm_fixed=0.692  lgbm_optuna=0.714  extratrees=0.676  logit=0.613  -> lgbm_optuna
+2025-09-22  n= 4102  lgbm_fixed=0.654  lgbm_optuna=0.682  extratrees=0.564  logit=0.625  -> lgbm_optuna
+2025-12-22  n= 4193  lgbm_fixed=0.662  lgbm_optuna=0.695  extratrees=0.595  logit=0.554  -> lgbm_optuna
+2026-03-23  n= 4284  lgbm_fixed=0.696  lgbm_optuna=0.722  extratrees=0.622  logit=0.586  -> lgbm_optuna
+2026-06-22  n= 4375  lgbm_fixed=0.662  lgbm_optuna=0.683  extratrees=0.577  logit=0.602  -> lgbm_optuna
+2026-09-21  n= 4466  lgbm_fixed=0.649  lgbm_optuna=0.662  extratrees=0.552  logit=0.700  -> logit
+
+===== DEV ('2018-01-01', '2025-10-22') =====
+                           cagr  total_return   vol  sharpe  sortino  max_dd  calmar  avg_month  median_month  pct_pos_months  worst_month
+Atlas (final)              32.7         807.6  26.1    1.21     1.59   -23.9    1.37        2.8           0.0            44.7        -12.3
+Atlas + USDC 4%            35.9         997.5  26.1    1.30     1.71   -21.9    1.64        3.0           0.3            55.3        -12.1
+Nucleo: tendencia + vol    29.8         665.0  26.8    1.11     1.46   -33.9    0.88        2.6          -0.2            43.6        -12.3
+Tendencia simple SMA200    21.8         366.3  48.4    0.65     0.68   -64.2    0.34        2.8           0.0            35.1        -41.8
+BTC buy & hold             30.5         700.4  66.7    0.74     0.99   -81.5    0.37        4.1           2.0            53.2        -37.3
+QQQ (Nasdaq-100)           19.8         309.1  24.2    0.87     1.13   -35.1    0.56        1.7           2.1            66.0        -13.6
+IWF (Russell 1000 Growth)  18.2         269.8  22.9    0.85     1.08   -32.7    0.56        1.6           2.2            67.0        -12.2
+Magnificent 7              36.2        1015.8  31.3    1.15     1.56   -48.9    0.74        2.9           2.9            62.8        -17.5
+Momentum S&P 500 top 10    10.7         121.4  32.4    0.48     0.62   -44.8    0.24        1.2           2.1            57.4        -22.8
+SPY (S&P 500)              14.3         182.9  19.6    0.78     0.95   -33.7    0.42        1.2           2.1            67.0        -12.5
+
+===== HOLDOUT ('2025-10-23', '2026-10-22') =====
+                           cagr  total_return   vol  sharpe  sortino  max_dd  calmar  avg_month  median_month  pct_pos_months  worst_month
+Atlas (final)               3.4           3.4   9.8    0.39     0.39    -5.0    0.68        0.3          -0.2            23.1         -2.2
+Atlas + USDC 4%             6.9           6.8   9.8    0.72     0.72    -4.4    1.56        0.5          -0.1            46.2         -2.2
+Nucleo: tendencia + vol     2.1           2.1  17.0    0.21     0.26   -12.3    0.17        0.2          -1.1            23.1         -3.1
+Tendencia simple SMA200    11.4          11.4  18.0    0.69     0.60    -8.4    1.36        0.9           0.0            15.4         -3.0
+BTC buy & hold            -24.5         -24.4  44.2   -0.41    -0.60   -48.9   -0.50       -1.4          -2.7            46.2        -20.4
+QQQ (Nasdaq-100)           20.5          20.3  19.9    1.04     1.61   -12.0    1.71        1.6          -0.1            46.2         -6.6
+IWF (Russell 1000 Growth)   5.8           5.8  17.9    0.41     0.65   -16.3    0.36        0.5          -1.4            38.5         -5.2
+Magnificent 7              16.8          16.7  21.8    0.82     1.27   -17.9    0.94        1.4           1.7            69.2         -8.8
+Momentum S&P 500 top 10    88.5          87.8  56.3    1.41     2.05   -36.4    2.43        6.1           4.4            69.2        -25.1
+SPY (S&P 500)              17.1          17.0  12.7    1.31     2.01    -8.9    1.93        1.3           0.2            69.2         -4.9
+
+===== FULL ('2018-01-01', '2026-10-22') =====
+                           cagr  total_return   vol  sharpe  sortino  max_dd  calmar  avg_month  median_month  pct_pos_months  worst_month
+Atlas (final)              29.0         838.4  24.8    1.15     1.47   -23.9    1.21        2.5           0.0            42.5        -12.3
+Atlas + USDC 4%            32.3        1072.6  24.8    1.25     1.59   -21.9    1.47        2.7           0.3            54.7        -12.1
+Nucleo: tendencia + vol    26.3         681.2  25.9    1.03     1.35   -33.9    0.78        2.4          -0.2            41.5        -12.3
+Tendencia simple SMA200    20.6         419.4  45.9    0.64     0.64   -64.2    0.32        2.6           0.0            33.0        -41.8
+BTC buy & hold             22.7         504.9  64.6    0.64     0.86   -81.5    0.28        3.5           1.2            51.9        -37.3
+QQQ (Nasdaq-100)           19.9         392.2  23.7    0.88     1.16   -35.1    0.57        1.7           1.9            63.2        -13.6
+IWF (Russell 1000 Growth)  16.8         291.3  22.4    0.81     1.04   -32.7    0.51        1.4           2.0            63.2        -12.2
+Magnificent 7              33.9        1202.2  30.3    1.12     1.52   -48.9    0.69        2.8           2.7            64.2        -17.5
+Momentum S&P 500 top 10    17.6         315.7  35.9    0.63     0.82   -44.8    0.39        1.8           2.3            58.5        -25.1
+SPY (S&P 500)              14.6         231.0  18.9    0.81     1.00   -33.7    0.43        1.2           1.9            67.0        -12.5
+
+ML: {
+ "dev": {
+  "n": 2852,
+  "auc": 0.5284,
+  "auc_by_year": {
+   "2018": 0.53,
+   "2019": 0.383,
+   "2020": 0.557,
+   "2021": 0.543,
+   "2022": 0.551,
+   "2023": 0.702,
+   "2024": 0.607,
+   "2025": 0.5
+  },
+  "share_gate_on": 1.0
+ },
+ "holdout": {
+  "n": 337,
+  "auc": 0.5584,
+  "auc_by_year": {
+   "2025": 0.526,
+   "2026": 0.63
+  },
+  "share_gate_on": 1.0
+ }
+}
+ML promovido: {'dev': 0.10729312762973352, 'holdout': 0.0}  trades: {'n_trades': 323, 'turnover_per_year': 5.3196564118403655, 'fees_paid_pct_of_initial': 0.060932656237321095, 'avg_exposure': 0.3550260324970535}

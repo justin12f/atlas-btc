@@ -1,0 +1,44 @@
+# Estrategia "Atlas" BTC/USDC v2 — configuracion BLOQUEADA el 2026-10-23 antes de correr el holdout.
+# Cualquier cambio posterior invalida el holdout como prueba limpia.
+
+periods:
+  train_start: "2014-06-01"      # inicio de datos para entrenar ML / HMM
+  dev_start: "2018-01-01"        # inicio del periodo fuera de muestra de desarrollo
+  dev_end: "2025-10-22"
+  holdout_start: "2025-10-23"    # ultimos 12 meses: prueba final, se corre UNA vez
+  holdout_end: "2026-10-22"
+
+trend:                            # capa de mediano plazo: 8 senales clasicas, sin parametros ajustados
+  signals: [sma50, sma100, sma200, mom30, mom90, mom180, donchian55_20, ema20_100]
+
+risk:
+  target_vol: 0.40                # volatilidad anual objetivo (BTC suele tener 55-80%)
+  vol_halflife: 10
+  band: 0.10                      # no rebalancear cambios < 10% del capital
+  dd_brake: false                 # probado: reduce DD pero cuesta mas rendimiento del que salva
+
+cycle:                            # capa de largo plazo (hipotesis del ciclo de 4 anios)
+  enabled: true
+  bear_window_days: [540, 900]    # dias desde el halving
+  multiplier: 0.5
+
+ml:                               # capa ML: direccion a 28 dias, AutoML campeon/retador
+  horizon: 28
+  retrain_days: 91
+  automl: true
+  optuna_trials: 8
+  gate_auc: 0.52                  # compuerta trimestral por AUC en CV purgada
+  mode: shadow_promotion          # el ML corre en papel y solo entra si demostro valor
+  promotion_window_days: 365
+  promotion_threshold: 0.02
+  promotion_weight: 1.0
+  ml_blend: 0.5                   # cuando esta promovido: 50% tendencia + 50% ML
+
+execution:
+  venue: binance_spot
+  pair: BTCUSDC
+  fee: 0.0010                     # taker sin descuento BNB
+  slippage: 0.0003
+  usdc_apy_base: 0.0              # conservador; sensibilidad con 4%
+  usdc_apy_sensitivity: 0.04
+  decision_time_utc: "00:00"      # cierre diario; orden en la primera hora del dia siguiente

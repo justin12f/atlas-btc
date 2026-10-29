@@ -1,0 +1,52 @@
+# Pre-registro Atlas v3 — escrito ANTES de correr cualquier permutacion (2026-10-25).
+# Cambiar algo de este archivo despues de ver resultados invalida las pruebas.
+
+periodos:
+  seleccion: ["2018-01-01", "2025-10-22"]      # todo se decide aqui
+  holdout: ["2025-10-23", "2026-10-22"]        # solo confirmacion de signo
+  holdout_datos_completos: ["2025-10-23", "2026-05-23"]   # ETH y stablecoins tienen datos hasta 2026-05-24
+
+baseline: {T: T0, V: ewma, D: none, M: off, C: on, E: off, S: off, P: on}   # = Atlas v2
+
+factores:
+  T:   # senal de tendencia
+    T0: "8 senales binarias actuales (SMA50/100/200, mom30/90/180, Donchian 55/20, EMA 20/100)"
+    T1: "solo horizontes >= 90 dias: SMA100, SMA200, mom90, mom180, mom365"
+    T2: "momentum continuo: media de Phi(z_L), z_L = log(P_t/P_t-L) / (sigma_diaria_EWMA60 * sqrt(L)), L en {30,90,180,365}"
+  V:   # pronostico de volatilidad
+    ewma: "actual: sqrt(0.5*EWMA_hl10(rv) + 0.5*media30(rv)) * sqrt(365)"
+    har: "HAR en log RV: log(media RV t+1..t+7) ~ log RV_1d + log RV_7d + log RV_30d; reajuste anual con datos pasados"
+  D:   # control de caida
+    none: "sin control"
+    gz: "Grossman-Zhou: exposicion * clip((E/M - 0.70)/0.30, 0, 1)"
+  M:   # filtro macro
+    off: "sin filtro"
+    on: "exposicion * 0.5 si SPY (rezago 1 dia) < SMA200 de SPY"
+  C:   # ciclo de 4 anios
+    on: "dias 540-900 tras halving -> exposicion * 0.5"
+    off: "sin ciclo"
+  E:   # diversificacion a ETH
+    off: "solo BTC"
+    on: "50% capital en manga BTC y 50% en manga ETH con las mismas reglas; ETH sin datos despues de 2026-05-24 -> USDC"
+  S:   # liquidez de stablecoins
+    off: "sin filtro"
+    on: "exposicion * 0.5 si log(oferta USDT+USDC) cae en 30 dias (rezago 2 dias); neutral sin datos"
+  P:   # ML en sombra con promocion
+    on: "actual (promocion mensual si mejoro 365 dias)"
+    off: "sin ML"
+
+metrica: sharpe_anual_desarrollo
+restriccion: max_dd_desarrollo >= -0.30
+costos: {fee: 0.0010, slippage: 0.0003, usdc_apy: 0.0}
+
+criterio_idea:
+  - "efecto principal en Sharpe > 0 con IC95% bootstrap estacionario (bloque medio 20 dias, B=2000) que excluye 0"
+  - "mejora en >= 70% de los pares"
+  - "no empeora la caida maxima promedio"
+criterio_permutacion_final:
+  - "White Reality Check sobre diferencia de Sharpe vs baseline, 383 alternativas, p < 0.05"
+  - "PBO (CSCV, S=16) < 0.20"
+  - "Sharpe deflactado > 0.95 con N = 384 + 30 pruebas previas"
+  - "gana a baseline en la mayoria de los anios de desarrollo y no pierde en holdout"
+regla_simplicidad: "capa existente con efecto <= 0 y no significativo se propone eliminar"
+advertencia: "la ventana del ciclo se eligio conociendo 2018 y 2022; su efecto en desarrollo es in-sample"

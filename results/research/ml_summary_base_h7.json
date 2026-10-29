@@ -1,0 +1,14 @@
+{
+  "variant": "base_h7",
+  "features": 52,
+  "minutes": 3.5,
+  "oos_dev": {
+    "n": 2852,
+    "auc": 0.4924,
+    "logloss": 0.7053,
+    "base_logloss": 0.6918,
+    "hit_rate_when_p>0.5": 0.5351,
+    "share_gate_on": 0.479
+  },
+  "oos_holdout": {}
+}

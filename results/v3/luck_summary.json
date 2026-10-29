@@ -1,0 +1,33 @@
+{
+  "base": "TT0_Vewma_Dnone_Moff_Con_Eoff_Soff_Pon",
+  "best_feasible": "TT1_Vewma_Dnone_Moff_Con_Eon_Son_Poff",
+  "sr_base": 1.2109485323310738,
+  "sr_best": 1.378323109443163,
+  "reality_check": {
+    "p_value": 0.444,
+    "max_t": 1.8978802856697121,
+    "best_k": 3,
+    "best_id": "TT0_Vewma_Dnone_Moff_Con_Eoff_Son_Poff"
+  },
+  "romano_wolf_significant": [],
+  "paired_p_best_vs_base_unadjusted": 0.201,
+  "pbo": {
+    "pbo": 0.2289044289044289,
+    "n_splits": 12870,
+    "median_oos_sharpe_of_is_best": 1.1581329414675674,
+    "median_is_sharpe_of_is_best": 1.5084400015485726
+  },
+  "dsr_best": {
+    "dsr": 0.967445035487257,
+    "sr_annual": 1.378323109443163,
+    "sr0_annual": 0.7201419288879429
+  },
+  "dsr_base": {
+    "dsr": 0.9208412474606507,
+    "sr_annual": 1.2109485323310738,
+    "sr0_annual": 0.7201419288879429
+  },
+  "years_best_beats_base": 6,
+  "n_years": 8,
+  "n_feasible": 329
+}

@@ -1,0 +1,46 @@
+2018-01-01  n= 1303  base=0.6834  lightgbm=0.7030  logit=1.5880  extratrees=0.7118  ensemble=0.7464  -> lightgbm (GATE OFF)
+2018-04-02  n= 1394  base=0.6872  lightgbm=0.7740  logit=1.2563  extratrees=0.7199  ensemble=0.7887  -> extratrees (GATE OFF)
+2018-07-02  n= 1485  base=0.6854  lightgbm=0.7101  logit=1.1940  extratrees=0.6941  ensemble=0.7523  -> extratrees (GATE OFF)
+2018-10-01  n= 1576  base=0.6884  lightgbm=0.7143  logit=1.1488  extratrees=0.7218  ensemble=0.7580  -> lightgbm (GATE OFF)
+2018-12-31  n= 1667  base=0.6989  lightgbm=0.7021  logit=1.4182  extratrees=0.7188  ensemble=0.7501  -> lightgbm (GATE OFF)
+2019-04-01  n= 1758  base=0.6935  lightgbm=0.7034  logit=1.1074  extratrees=0.7181  ensemble=0.7448  -> lightgbm (GATE OFF)
+2019-07-01  n= 1849  base=0.6860  lightgbm=0.6876  logit=0.9943  extratrees=0.6993  ensemble=0.7305  -> lightgbm (GATE OFF)
+2019-09-30  n= 1940  base=0.6916  lightgbm=0.7069  logit=1.0226  extratrees=0.7172  ensemble=0.7444  -> lightgbm (GATE OFF)
+2019-12-30  n= 2031  base=0.6987  lightgbm=0.7192  logit=1.2349  extratrees=0.7289  ensemble=0.7806  -> lightgbm (GATE OFF)
+2020-03-30  n= 2122  base=0.6926  lightgbm=0.7039  logit=1.0682  extratrees=0.7087  ensemble=0.7434  -> lightgbm (GATE OFF)
+2020-06-29  n= 2213  base=0.6936  lightgbm=0.7350  logit=0.8892  extratrees=0.7044  ensemble=0.7355  -> extratrees (GATE OFF)
+2020-09-28  n= 2304  base=0.6940  lightgbm=0.6990  logit=0.8759  extratrees=0.7049  ensemble=0.7219  -> lightgbm (GATE OFF)
+2020-12-28  n= 2395  base=0.7027  lightgbm=0.7140  logit=0.8904  extratrees=0.7131  ensemble=0.7376  -> extratrees (GATE OFF)
+2021-03-29  n= 2486  base=0.6914  lightgbm=0.6870  logit=0.8328  extratrees=0.6939  ensemble=0.7100  -> lightgbm
+2021-06-28  n= 2577  base=0.6895  lightgbm=0.6908  logit=0.7954  extratrees=0.6990  ensemble=0.7054  -> lightgbm (GATE OFF)
+2021-09-27  n= 2668  base=0.6896  lightgbm=0.7071  logit=0.8037  extratrees=0.6985  ensemble=0.7128  -> extratrees (GATE OFF)
+2021-12-27  n= 2759  base=0.6882  lightgbm=0.6884  logit=0.8027  extratrees=0.6957  ensemble=0.7037  -> lightgbm (GATE OFF)
+2022-03-28  n= 2850  base=0.6899  lightgbm=0.6793  logit=0.7951  extratrees=0.6912  ensemble=0.6961  -> lightgbm
+2022-06-27  n= 2941  base=0.6959  lightgbm=0.6846  logit=0.7886  extratrees=0.6942  ensemble=0.6972  -> lightgbm
+2022-09-26  n= 3032  base=0.6951  lightgbm=0.6830  logit=0.7957  extratrees=0.6928  ensemble=0.6996  -> lightgbm
+2022-12-26  n= 3123  base=0.6935  lightgbm=0.6773  logit=0.8063  extratrees=0.6878  ensemble=0.6954  -> lightgbm
+2023-03-27  n= 3214  base=0.6939  lightgbm=0.6846  logit=0.7944  extratrees=0.6851  ensemble=0.6960  -> lightgbm
+2023-06-26  n= 3305  base=0.6935  lightgbm=0.6737  logit=0.7203  extratrees=0.6839  ensemble=0.6817  -> lightgbm
+2023-09-25  n= 3396  base=0.6955  lightgbm=0.6854  logit=0.7301  extratrees=0.6906  ensemble=0.6887  -> lightgbm
+2023-12-25  n= 3487  base=0.6959  lightgbm=0.6792  logit=0.7308  extratrees=0.6891  ensemble=0.6883  -> lightgbm
+2024-03-25  n= 3578  base=0.6985  lightgbm=0.6922  logit=0.7237  extratrees=0.6935  ensemble=0.6918  -> ensemble
+2024-06-24  n= 3669  base=0.6967  lightgbm=0.6730  logit=0.7190  extratrees=0.6908  ensemble=0.6795  -> lightgbm
+2024-09-23  n= 3760  base=0.6984  lightgbm=0.6974  logit=0.7362  extratrees=0.7018  ensemble=0.6960  -> ensemble
+2024-12-23  n= 3851  base=0.6944  lightgbm=0.6774  logit=0.7206  extratrees=0.6855  ensemble=0.6778  -> lightgbm
+2025-03-24  n= 3942  base=0.6952  lightgbm=0.6956  logit=0.7102  extratrees=0.6929  ensemble=0.6901  -> ensemble
+2025-06-23  n= 4033  base=0.6884  lightgbm=0.6941  logit=0.6985  extratrees=0.6876  ensemble=0.6842  -> ensemble
+2025-09-22  n= 4124  base=0.6883  lightgbm=0.6930  logit=0.7052  extratrees=0.6966  ensemble=0.6902  -> ensemble (GATE OFF)
+{
+  "variant": "base_h7",
+  "features": 52,
+  "minutes": 3.5,
+  "oos_dev": {
+    "n": 2852,
+    "auc": 0.4924,
+    "logloss": 0.7053,
+    "base_logloss": 0.6918,
+    "hit_rate_when_p>0.5": 0.5351,
+    "share_gate_on": 0.479
+  },
+  "oos_holdout": {}
+}
