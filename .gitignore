@@ -7,3 +7,4 @@ data/live/
 *.key
 results/v3/boot_sharpes.npy
 /PLAN_paper_trading_hyperliquid.md
+/.crew/
