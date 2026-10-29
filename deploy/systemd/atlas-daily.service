@@ -1,0 +1,20 @@
+[Unit]
+Description=Atlas: corrida diaria (paper)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=atlas
+Group=atlas
+WorkingDirectory=/opt/atlas
+EnvironmentFile=/etc/atlas/atlas.env
+ExecStart=/bin/sh -c '/opt/atlas/.venv/bin/python -m atlas.cli collect --final; /opt/atlas/.venv/bin/python -m atlas.cli daily --mode paper'
+TimeoutStartSec=50min
+MemoryMax=1G
+Nice=10
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/atlas
+PrivateTmp=true

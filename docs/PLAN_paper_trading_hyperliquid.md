@@ -399,7 +399,7 @@ Implementation shortfall por orden = signo × (VWAP / cierre de 00:00 − 1) + c
 | Unitarias | `round_px`/`round_sz` contra casos de la doc y fixtures; mínimo 10 USDC; banda; interruptor y reanudación; comisión por `feeToken`; invariantes del ledger (sin saldos negativos, conservación de valor menos comisiones). |
 | Anti look-ahead | Las existentes + nueva: la señal del día t con datos truncados en t es idéntica a la calculada con datos completos. Barras diarias solo con velas `t < fin del día`. |
 | Paridad de señal | Para cada día de la réplica, `atlas.signal` == `engine.strategy.build_targets` sobre la misma serie cosida (tolerancia 1e-9). |
-| Réplica | `atlas replay --from 2025-03-01 --to 2026-10-22 --broker fake`: recorre el pipeline día por día con datos truncados y debe reproducir `engine.portfolio.simulate` (mismas operaciones, equity dentro de 1e-6). |
+| Réplica | `atlas replay --from 2025-03-01 --to 2026-10-22 --broker fake`: recorre el pipeline día por día con datos truncados y debe reproducir `engine.portfolio.simulate` (mismos días de operación, objetivos idénticos; equity dentro de 1e-3 relativo — ver §22). |
 | Paridad de datos | HL vs Bitstamp/Binance: cierre y rv (sección 7.3). |
 | Fallas | Timeout, 429, respuesta vacía, velas faltantes, libro viejo, corrida duplicada (no duplica operaciones), proceso muerto a mitad de ejecución (reanuda reconciliando), reinicio del VPS, desfase de reloj. |
 | Integración testnet | Marcadas `@pytest.mark.testnet`, se corren a mano: ciclo completo compra→venta, parcial, cancelación, reprecio, `schedule_cancel`. |
@@ -555,3 +555,32 @@ No cambies config/strategy.yaml ni la lógica de engine/. Nada de órdenes en ma
 - **Capa del ciclo frágil:** no se toca; se documenta su efecto en cada reporte mensual.
 - **Testnet poco representativo:** solo valida plomería; los costos se miden en el Modo A con el libro de mainnet.
 - No es asesoría financiera.
+
+---
+
+## 22. Correcciones del orquestador (2026-10-29, tras F0–F3)
+
+Evidencia en `docs/hl_facts_verified.md`. Lo que cambió respecto al texto de arriba:
+
+1. **Velas:** HL guarda *aprox.* 5000 velas por intervalo (se midieron 5043 de 5m y 5217 de 1m), no exactamente 5000.
+   La vela de 1d spot tiene la historia completa del par (desde 2025-02-03) y coincide exactamente con la agregación de 5m.
+2. **`spotMetaAndAssetCtxs`:** los contextos NO están alineados por posición con `universe`; se emparejan por `coin`.
+3. **Testnet:** no existe UBTC. `@50 BTC/USDC` está roto (szDecimals 0, sin bids). `@2072 POBTC/USDC` (szDecimals 5)
+   sigue el precio de BTC con un libro de un nivel → sirve solo para plomería. Además, el faucet exige depósito en mainnet.
+   Con la decisión de Justin de no mover dinero, **el Modo B queda construido y probado solo con dobles** (`testnet.enabled: false`).
+   Pendiente para F4: que `daily --mode testnet` resuelva el par de testnet (`testnet.spot_pair`) con el spotMeta de testnet
+   para las órdenes, manteniendo la señal de mainnet.
+4. **Comisiones:** la dirección cero devuelve nivel VIP1; las base (0.07%/0.04% spot) se confirmaron por la documentación y el esquema.
+5. **Réplica vs `simulate`:** `simulate` trabaja en pesos (el costo no entra al denominador de la deriva); el ledger lleva
+   unidades redondeadas a szDecimals con comisión en el activo recibido. Por construcción no pueden coincidir a 1e-6.
+   Resultado medido 2025-03-01→2026-10-22: objetivos idénticos (dif. 0), 64/64 días de operación iguales, equity máx.
+   dif. relativa 5.2e-5. Criterio nuevo: mismos días + objetivos exactos + equity < 1e-3. En la historia completa
+   2018→2026 la deriva se acumula (~2% y 5 días distintos de 339) por el mismo motivo; no es un error de señal.
+6. **`scripts/run_backtest.py`** necesita `data/raw/sp500_prices.parquet` (benchmarks de acciones) que no está en el repo.
+   Para probar "mismos números" se usa `scripts/v3_fingerprint.py` (hash de objetivos y de la simulación + métricas).
+7. **Señal en vivo:** `trend_signals` pone NaN a las primeras 200 filas por posición y las EWM dependen del inicio, así que la
+   señal se calcula siempre sobre la serie cosida completa (Bitstamp desde el inicio + HL), nunca sobre una ventana.
+8. **Fuente de la señal (7.4): spot UBTC/USDC** — mediana |spot/perp−1| 0.048%, rv spot/Binance 0.985, volumen ~36M/día.
+9. **Plazo del recolector:** HL 5m cubre desde 2026-10-12; la semilla Bitstamp termina el 2026-10-22. Si el recolector
+   arranca antes de ~2026-11-11 no hay hueco de rv. Mientras tanto, las velas de F0 están grabadas en `tests/fixtures/hl/`
+   y `atlas backfill --from-fixtures` las siembra.

@@ -1,0 +1,20 @@
+[Unit]
+Description=Atlas: recolección horaria de Hyperliquid
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=atlas
+Group=atlas
+WorkingDirectory=/opt/atlas
+EnvironmentFile=/etc/atlas/atlas.env
+ExecStart=/opt/atlas/.venv/bin/python -m atlas.cli collect
+TimeoutStartSec=15min
+MemoryMax=1G
+Nice=10
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/atlas
+PrivateTmp=true

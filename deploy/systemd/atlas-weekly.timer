@@ -1,0 +1,10 @@
+[Unit]
+Description=Reporte semanal lunes 01:00 UTC
+
+[Timer]
+OnCalendar=Mon *-*-* 01:00:00 UTC
+Persistent=true
+RandomizedDelaySec=0
+
+[Install]
+WantedBy=timers.target

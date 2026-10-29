@@ -1,4 +1,3 @@
-from datetime import datetime, timezone
 
 from atlas.alerts import Alerter
 from atlas.data.store import SQLiteStore

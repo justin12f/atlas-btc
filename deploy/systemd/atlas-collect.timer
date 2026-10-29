@@ -1,0 +1,10 @@
+[Unit]
+Description=Recolección horaria (minuto 03)
+
+[Timer]
+OnCalendar=*-*-* *:03:00 UTC
+Persistent=true
+RandomizedDelaySec=20
+
+[Install]
+WantedBy=timers.target

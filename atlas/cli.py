@@ -19,7 +19,6 @@ import os
 import sys
 import time
 from contextlib import contextmanager
-from pathlib import Path
 
 import pandas as pd
 
@@ -155,6 +154,9 @@ def cmd_daily(args, cfg) -> int:
             broker = _testnet_broker(cfg)
         s = run_daily(ctx, broker, args.mode)
         print(json.dumps(s.__dict__, indent=1, default=str))
+        if args.mode == "paper" and s.status != "already_done":
+            from atlas.shadow import record_shadow
+            record_shadow(st, s.date, s.target)
         from atlas.reports import daily_report, write_report
         write_report(data_dir() / "reports" / "daily", f"{s.date}-{args.mode}", daily_report(st, args.mode, s.date))
         return 0

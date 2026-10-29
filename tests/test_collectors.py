@@ -1,4 +1,3 @@
-from datetime import datetime, timezone
 
 from atlas.data.collectors import (INTERVAL_MS, candle_window, closed_only, collect_all, collect_candles,
                                    collect_funding, impact_bps)
