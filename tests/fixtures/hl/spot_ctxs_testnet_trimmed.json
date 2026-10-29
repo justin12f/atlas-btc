@@ -1,0 +1,95 @@
+{
+"_nota": "recorte de spotMetaAndAssetCtxs de testnet (2026-10-29): solo ctxs de pares BTC y top-5 por volumen",
+"ctxs": [
+{
+"prevDayPx": "4.5795",
+"dayNtlVlm": "1405.7706",
+"markPx": "4.5795",
+"midPx": "4.55685",
+"circulatingSupply": "198728760.5064100027",
+"coin": "PURR/USDC",
+"totalSupply": "198731658.547360003",
+"dayBaseVlm": "307.0"
+},
+{
+"prevDayPx": "6100.0",
+"dayNtlVlm": "0.0",
+"markPx": "6100.0",
+"midPx": null,
+"circulatingSupply": "3999994945718.2797851562",
+"coin": "@50",
+"totalSupply": "3999994946461.390625",
+"dayBaseVlm": "0.0"
+},
+{
+"prevDayPx": "0.002266",
+"dayNtlVlm": "0.0",
+"markPx": "0.002259",
+"midPx": "0.002262",
+"circulatingSupply": "2499976147.2186603546",
+"coin": "@460",
+"totalSupply": "2499976147.2186603546",
+"dayBaseVlm": "0.0"
+},
+{
+"prevDayPx": "158.59",
+"dayNtlVlm": "2990187.6921000001",
+"markPx": "160.25",
+"midPx": "158.72",
+"circulatingSupply": "474843845.8014268279",
+"coin": "@1035",
+"totalSupply": "999319822.0701379776",
+"dayBaseVlm": "18761.83"
+},
+{
+"prevDayPx": "45000.0",
+"dayNtlVlm": "854.55",
+"markPx": "10000.0",
+"midPx": "27500.0",
+"circulatingSupply": "20999999.935752809",
+"coin": "@1054",
+"totalSupply": "20999999.9377528094",
+"dayBaseVlm": "0.01899"
+},
+{
+"prevDayPx": "0.010304",
+"dayNtlVlm": "0.00010304",
+"markPx": "0.010304",
+"midPx": "0.010319",
+"circulatingSupply": "24999990.2131944783",
+"coin": "@1125",
+"totalSupply": "24999990.2131944783",
+"dayBaseVlm": "0.01"
+},
+{
+"prevDayPx": "1.0021",
+"dayNtlVlm": "4995.96955",
+"markPx": "1.0021",
+"midPx": null,
+"circulatingSupply": "184467440737.0955200195",
+"coin": "@1455",
+"totalSupply": "184467440737.0955200195",
+"dayBaseVlm": "4985.5"
+},
+{
+"prevDayPx": "138.16",
+"dayNtlVlm": "4982.0496",
+"markPx": "138.16",
+"midPx": "94.414",
+"circulatingSupply": "474843845.8014268279",
+"coin": "@1456",
+"totalSupply": "999319822.0701379776",
+"dayBaseVlm": "36.06"
+},
+{
+"prevDayPx": "80904.0",
+"dayNtlVlm": "0.0",
+"markPx": "80440.0",
+"midPx": "80439.5",
+"circulatingSupply": "999.999518816",
+"coin": "@2072",
+"totalSupply": "999.999518816",
+"dayBaseVlm": "0.0"
+}
+]
+}

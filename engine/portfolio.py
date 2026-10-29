@@ -100,6 +100,12 @@ def ml_promotion(d: pd.DataFrame, core_target: pd.Series, ml_target: pd.Series, 
     return pd.DataFrame({"ml_weight": w, "target": mix, "edge": edge.reindex(core_target.index)})
 
 
+def should_trade(e: float, w: float, band: float) -> bool:
+    """Regla de banda: operar si el cambio de exposicion supera la banda, o salida total
+    (objetivo < 2%), o entrada total (objetivo > 98%). La usan simulate y atlas (planificador)."""
+    return abs(e - w) >= band or (e < 0.02 and w >= 0.02) or (e > 0.98 and w <= 0.98 and abs(e - w) > 0.02)
+
+
 def simulate(d: pd.DataFrame, target: pd.Series, cfg: PortfolioConfig,
              start: str | None = None, end: str | None = None) -> pd.DataFrame:
     """La exposicion decidida al cierre de t se mantiene durante el dia t+1."""
@@ -131,7 +137,7 @@ def simulate(d: pd.DataFrame, target: pd.Series, cfg: PortfolioConfig,
         if i < paused_until:
             e = 0.0
         trade = 0.0
-        if abs(e - w) >= cfg.band or (e < 0.02 and w >= 0.02) or (e > 0.98 and w <= 0.98 and abs(e - w) > 0.02):
+        if should_trade(e, w, cfg.band):
             trade = e - w
             w = e
         cost = abs(trade) * cost_rate

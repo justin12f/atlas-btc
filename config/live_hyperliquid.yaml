@@ -1,0 +1,53 @@
+# Operación en vivo de Atlas v3 sobre Hyperliquid (papel en mainnet + plomería en testnet).
+# Los parámetros de la ESTRATEGIA no viven aquí: se leen de config/strategy.yaml (bloqueado).
+# Secretos solo por variables de entorno (ver deploy/atlas.env.example).
+mode: paper                 # paper | testnet | both   (live no existe en este plan)
+
+market:
+  spot_pair: "UBTC/USDC"    # se resuelve a "@N" con spotMeta al arrancar (2026-10-29: @142, szDecimals 5)
+  perp_coin: "BTC"
+  signal_source: spot       # decisión de la Fase 0 (docs/hl_facts_verified.md §7.4). No cambiar sin pre-registro.
+
+paper:
+  initial_usdc: 10000
+  fill_policy: maker_first  # maker_first | taker
+  maker_timeout_min: 30
+  reprice_every_min: 5
+  max_slippage: 0.005       # tope para el IOC de respaldo
+  capacity_probe_usd: [10000, 100000, 1000000]   # solo se mide, no entra al ledger
+
+testnet:
+  enabled: false            # 2026-10-29: Justin decidió no fondear testnet por ahora; Modo B solo con fixtures
+  spot_pair: "POBTC/USDC"   # testnet no tiene UBTC; POBTC/USDC replica el precio de BTC (solo plomería)
+  initial_usdc: 1000
+  max_order_usd: 200
+
+fees:                       # cuadro base verificado 2026-10-29; se sobrescribe con userFees si hay dirección
+  spot_taker: 0.00070
+  spot_maker: 0.00040
+  perp_taker: 0.00045
+  perp_maker: 0.00015
+
+risk:                       # el umbral del interruptor se LEE de config/strategy.yaml
+  max_data_age_min: 20
+  max_ref_divergence: 0.01  # |precio HL / referencia - 1|
+  min_order_usd: 10
+  max_late_hours: 23        # si la corrida diaria llega más tarde, se usa la señal del día siguiente
+  max_jump_5m: 0.08         # salto en 5 min sin confirmación del perp -> dato dudoso
+
+data:
+  db: data/live/atlas.db    # relativo a ATLAS_DATA_DIR si está definida (VPS: /var/lib/atlas)
+  history_seed: data/processed/btc_daily.parquet
+  bitstamp_last_day: "2026-10-22"   # último día de la semilla; después solo HL (o Binance de respaldo)
+
+hl:
+  mainnet_url: "https://api.hyperliquid.xyz"
+  testnet_url: "https://api.hyperliquid-testnet.xyz"
+  weight_per_min: 1000      # presupuesto propio por debajo del límite de 1,200 por IP
+  timeout_s: 20
+  max_retries: 5
+
+alerts:
+  telegram: true
+  healthchecks: true
+  drawdown_levels: [0.15, 0.25, 0.36]
