@@ -52,7 +52,7 @@ nunca cuesta nada; una operación con datos malos sí. No hay prisa.
 ```bash
 cd /opt/atlas && sudo -u atlas git pull --ff-only
 sudo -u atlas .venv/bin/pip install -r requirements-live.txt
-sudo -u atlas env ATLAS_DATA_DIR=$(mktemp -d) .venv/bin/python -m pytest tests/ -q -m "not testnet"
+sudo -u atlas env ATLAS_DATA_DIR=$(sudo -u atlas mktemp -d) .venv/bin/python -m pytest tests/ -q -m "not testnet"
 sudo systemctl daemon-reload   # solo si cambiaron las unidades (vuelve a correr deploy/install.sh)
 ```
 

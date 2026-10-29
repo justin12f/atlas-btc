@@ -11,8 +11,9 @@ ETC=/etc/atlas
 need() { command -v "$1" >/dev/null || { echo "falta $1"; exit 1; }; }
 need python3; need git; need systemctl
 python3 -c 'import sys; assert sys.version_info >= (3, 11), "se requiere Python >= 3.11"'
-command -v sqlite3 >/dev/null || apt-get install -y sqlite3
-command -v chronyd >/dev/null || apt-get install -y chrony
+if ! command -v sqlite3 >/dev/null || ! command -v chronyd >/dev/null; then
+  apt-get update -q && apt-get install -y -q sqlite3 chrony
+fi
 
 # Usuario de sistema sin shell de login ni sudo
 id atlas >/dev/null 2>&1 || useradd --system --home-dir "$DATA" --shell /usr/sbin/nologin atlas
@@ -33,7 +34,8 @@ sudo -u atlas "$APP/.venv/bin/pip" install -q -r "$APP/requirements-live.txt"
 
 # La semilla histórica (data/processed/btc_daily.parquet) viene en el repo.
 # Pruebas antes de activar timers (regla 7)
-sudo -u atlas env ATLAS_DATA_DIR="$(mktemp -d)" bash -c "cd $APP && .venv/bin/python -m pytest tests/ -q -m 'not testnet'"
+TMPD="$(sudo -u atlas mktemp -d)"
+sudo -u atlas env ATLAS_DATA_DIR="$TMPD" bash -c "cd $APP && .venv/bin/python -m pytest tests/ -q -m 'not testnet'"
 
 if [ ! -f "$ETC/atlas.env" ]; then
   install -o atlas -g atlas -m 600 "$APP/deploy/atlas.env.example" "$ETC/atlas.env"
