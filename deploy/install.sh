@@ -26,7 +26,7 @@ if [ ! -d "$APP/.git" ]; then
   [ -n "$REPO_URL" ] || { echo "uso: install.sh <url-del-repo> (primera vez)"; exit 1; }
   git clone "$REPO_URL" "$APP"
 else
-  git -C "$APP" pull --ff-only
+  git -c safe.directory="$APP" -C "$APP" pull --ff-only
 fi
 chown -R atlas:atlas "$APP"
 
