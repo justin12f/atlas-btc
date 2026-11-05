@@ -1,8 +1,10 @@
-# Pre-registro del periodo de papel (sección 15) — BORRADOR, pendiente de aprobación de Justin.
+# Pre-registro del periodo de papel (sección 15) — APROBADO por Justin el 2026-11-04.
 # Se fija ANTES del día 1. Cambiar algo después de ver resultados invalida la evaluación.
-estado: borrador          # -> "aprobado" con fecha y firma de Justin antes del día 1
-aprobado_por: null
-fecha_aprobacion: null
+estado: aprobado
+aprobado_por: Justin Franco
+fecha_aprobacion: "2026-11-04"
+# Nota: la aprobación llegó después del día 1. Los criterios no cambiaron desde el borrador del 2026-10-29
+# (commit afb620f, anterior a la primera decisión); se aprobó con 2 órdenes vistas y sin modificar nada.
 
 estrategia:
   config: config/strategy.yaml          # bloqueada; su sha256 queda en cada fila de `signals`
