@@ -37,3 +37,11 @@ def test_salida_limita_perdida_del_dia():
     s = ri.simulate_intraday_exit(d, tgt, pc, "2020-01-01", "2021-01-31", 0.10)
     assert s["stop"].any()
     assert (s.loc[s["stop"], "ret"] >= -0.10 - 0.02).all()
+
+
+def test_mitad_fija_g2():
+    spec2 = importlib.util.spec_from_file_location("rg", ROOT / "scripts/research_growth_2026_11.py")
+    rg = importlib.util.module_from_spec(spec2)
+    spec2.loader.exec_module(rg)
+    t = pd.Series([0.0, 0.4, 1.0])
+    assert rg.half_fixed(t).tolist() == [0.5, 0.7, 1.0]
