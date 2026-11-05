@@ -8,6 +8,7 @@ CLI de Atlas:  python -m atlas.cli <comando>
   ack-market --pair UBTC/USDC           aceptar un cambio de spotMeta tras revisarlo
   status                                estado de la base y de cada modo
   report [--weekly] [--date D]          reportes en reports/
+  parity [--from D] [--binance-days N] paridad de datos HL vs Binance/perp/Bitstamp
   replay --from D --to D --broker fake  réplica contra engine.portfolio.simulate
 """
 from __future__ import annotations
@@ -236,6 +237,27 @@ def cmd_report(args, cfg) -> int:
     return 0
 
 
+def cmd_parity(args, cfg) -> int:
+    from atlas.data.stitch import to_frame
+    from atlas.parity import parity_markdown, parity_summary, parity_table
+    from atlas.reports import write_report
+    st = _store(cfg)
+    if args.binance_days:
+        print("binance 5m", backfill_binance(st, args.binance_days))
+    m = json.loads(st.kv_get("market_cache:" + cfg["market"]["spot_pair"]) or "null")
+    coin = m["coin"] if m else _market(cfg, _info(cfg), st).coin
+    hl5 = to_frame([r for r in st.candles(coin, "5m") if r["source"] == "hl"])
+    refs = {"binance": to_frame(st.candles("BTCUSDC", "5m")), "perp": to_frame(st.candles(cfg["market"]["perp_coin"], "5m"))}
+    refs = {k: v for k, v in refs.items() if len(v)}
+    seed = pd.read_parquet(ROOT / cfg["data"]["history_seed"])
+    t = parity_table(hl5, refs, seed=seed, start=args.date_from, end=args.date_to)
+    s = parity_summary(t)
+    print(json.dumps(s, indent=1))
+    name = f"parity_{s['from']}_{s['to']}"
+    print(write_report(data_dir() / "reports" / "parity", name, parity_markdown(t, s), t.reset_index(names="date")))
+    return 0
+
+
 def cmd_replay(args, cfg) -> int:
     from atlas.replay import run_replay
     from engine.strategy import load_config
@@ -274,6 +296,10 @@ def main(argv: list[str] | None = None) -> int:
     p = sub.add_parser("report")
     p.add_argument("--weekly", action="store_true")
     p.add_argument("--date")
+    p = sub.add_parser("parity")
+    p.add_argument("--from", dest="date_from")
+    p.add_argument("--to", dest="date_to")
+    p.add_argument("--binance-days", type=int, default=0)
     p = sub.add_parser("replay")
     p.add_argument("--from", dest="date_from", required=True)
     p.add_argument("--to", dest="date_to", required=True)
@@ -282,7 +308,7 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
     cfg = load_live_config(args.config)
     fn = {"collect": cmd_collect, "backfill": cmd_backfill, "daily": cmd_daily, "resume": cmd_resume,
-          "ack-market": cmd_ack_market, "status": cmd_status, "report": cmd_report, "replay": cmd_replay}[args.cmd]
+          "ack-market": cmd_ack_market, "status": cmd_status, "report": cmd_report, "parity": cmd_parity, "replay": cmd_replay}[args.cmd]
     return fn(args, cfg)
 
 
