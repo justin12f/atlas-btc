@@ -1,0 +1,48 @@
+# Pre-registro "Atlas Crecimiento" — escrito ANTES de correr cualquier prueba (2026-11-05).
+# Objetivo del usuario: máximo rendimiento a largo plazo, tolera caídas grandes, no necesita liquidez.
+# Cambiar algo de este archivo después de ver resultados invalida la evaluación.
+# Atlas v3 (config/strategy.yaml) NO cambia: una variante que pase solo entra en sombra en el papel.
+
+estado: aprobado
+aprobado_por: Justin Franco
+fecha_aprobacion: "2026-11-05"
+
+base:
+  config: config/strategy.yaml
+  usdc_apy: 0.0                          # se juzga sin rendimiento del USDC; con 4% solo se reporta
+  comparadores: ["Atlas v3", "BTC comprado y mantenido"]
+
+periodos:
+  desarrollo: ["2018-01-01", "2025-10-22"]
+  holdout: ["2025-10-23", "2026-10-22"]
+  inicios_robustez: ["2018-01-01", "2019-01-01", "2020-01-01", "2021-01-01", "2022-01-01", "2023-01-01"]
+
+comun_a_las_tres:
+  interruptor_caida: 0.60                # coherente con el límite de caída; con 0.36 solo se reporta
+  banda: 0.10
+  ciclo: "igual que v3"
+
+variantes:                               # parámetros fijados de antemano, sin búsqueda
+  G1_sin_freno_vol: "objetivo = tendencia × ciclo (risk.target_vol = 99, el escalador de volatilidad queda en 1)"
+  G2_mitad_fija: "objetivo = 0.5 + 0.5 × objetivo de Atlas v3 (mitad siempre en BTC); el interruptor lleva todo a 0"
+  G3_vol60: "risk.target_vol = 0.60; todo lo demás igual a v3"
+
+costos: {fee: 0.0010, slippage: 0.0003}
+metrica_principal: "rendimiento anual compuesto (CAGR)"
+
+criterios:                               # una variante pasa solo si cumple TODOS
+  C1: "CAGR en desarrollo mayor que Atlas v3, con IC95% bootstrap estacionario (bloque 20 días, B=2000) de la diferencia que excluye 0"
+  C2: "caída máxima en desarrollo >= -0.60"
+  C3: "en holdout, no peor que Atlas v3 por más de 5 puntos"
+  C4: "CAGR mayor que Atlas v3 en al menos 4 de los 6 inicios"
+  C5: "CAGR mayor que BTC comprado y mantenido en al menos 4 de los 6 inicios (si no, conviene más mantener BTC)"
+  C6: "con costos × 2.5, la diferencia de CAGR contra Atlas v3 en desarrollo sigue siendo > 0"
+
+decision:
+  pasa: "corre en sombra en el papel 12 meses junto a Atlas v3; se decide en la revisión de 12 meses"
+  no_pasa: "se descarta y queda documentada"
+  reporte: "se publican las tres con todos sus números"
+
+advertencias:
+  - "G3 es parecida a I1 (vol 50%) del pre-registro anterior, que ya se vio; no es ciega."
+  - "Van ~420 pruebas sobre esta historia; cualquier mejora en desarrollo está sesgada a favor."
