@@ -1,0 +1,48 @@
+# Pre-registro de ideas para Atlas — escrito ANTES de correr cualquier prueba (2026-11-05).
+# Cambiar algo de este archivo después de ver resultados invalida la evaluación.
+# Atlas v3 (config/strategy.yaml) NO cambia: una idea que pase solo entra en sombra en el papel.
+
+estado: aprobado
+aprobado_por: Justin Franco
+fecha_aprobacion: "2026-11-05"
+
+base:
+  config: config/strategy.yaml           # Atlas v3 tal cual, sha256 c74e2828…6019
+  usdc_apy: 0.0                          # las ideas se juzgan sin rendimiento del USDC (conservador); con 4% solo se reporta
+
+periodos:
+  desarrollo: ["2018-01-01", "2025-10-22"]
+  holdout: ["2025-10-23", "2026-10-22"]   # un año: solo confirma el signo, no decide solo
+  inicios_robustez: ["2018-01-01", "2019-01-01", "2020-01-01", "2021-01-01", "2022-01-01", "2023-01-01"]
+
+ideas:                                    # parámetros fijados de antemano, sin búsqueda en rejilla
+  I1_vol50:
+    descripcion: "volatilidad objetivo 50% en vez de 40% (risk.target_vol = 0.50); todo lo demás igual"
+  I2_piso30:
+    descripcion: "exposición mínima permanente: objetivo final = max(objetivo v3, 0.30); el interruptor de caída sigue llevando a 0"
+  I3_salida_intradia:
+    descripcion: >
+      si durante el día t+1 el mínimo toca cierre_t × (1 − 10%) y hay BTC, se vende todo a cierre_t × 0.90
+      con 0.5% de slippage extra más el costo normal; el resto del día en USDC; al cierre de t+1 se decide
+      normalmente partiendo de exposición 0
+    umbral: 0.10
+
+costos: {fee: 0.0010, slippage: 0.0003}
+metrica_principal: "rendimiento anual compuesto (CAGR) en desarrollo"
+
+criterios:                                # una idea pasa solo si cumple TODOS
+  C1: "diferencia de CAGR en desarrollo > 0 con IC95% bootstrap estacionario (bloque medio 20 días, B=2000, pares de días) que excluye 0"
+  C2: "caída máxima en desarrollo >= -0.30"
+  C3: "en holdout, el rendimiento no es peor que la base por más de 2 puntos"
+  C4: "CAGR mayor que la base en al menos 4 de los 6 inicios de robustez (cada uno hasta 2026-10-22)"
+  C5: "con costos × 2.5 (0.25% + 0.08%), la diferencia de CAGR en desarrollo sigue siendo > 0"
+
+decision:
+  pasa: "corre en sombra en el papel 12 meses junto a Atlas v3; se decide en la revisión de 12 meses del papel"
+  no_pasa: "se descarta y queda documentada con sus números"
+  reporte: "se publican las tres ideas con todos sus números, pasen o no"
+
+advertencias:
+  - "I1 no es ciega: robustness.json ya mostró vol 50% (CAGR 32.6% vs 30.9%). Su C1 cuenta como confirmación, no como descubrimiento."
+  - "Antes de esto se hicieron ~414 pruebas sobre esta misma historia (grid v3 y anteriores); cualquier mejora en desarrollo está sesgada a favor."
+  - "Con solo 3 ideas no se corrige por comparaciones múltiples; por eso C3–C5 exigen consistencia además del IC."
