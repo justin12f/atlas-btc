@@ -37,3 +37,32 @@ def test_backfill_from_fixtures(capsys):
     st.kv_set("market_cache:UBTC/USDC", json.dumps({"coin": "@142"}))
     assert cli.main(["backfill", "--from-fixtures"]) == 0
     assert st.last_candle_t("@142", "5m") is not None
+
+
+class _Rec:
+    def __init__(self):
+        self.sent = []
+
+    def send(self, text, level="info"):
+        self.sent.append((level, text))
+
+
+def test_collect_fail_streak_alerts_once_and_on_recovery():
+    st = cli._store(cli.load_live_config())
+    a = _Rec()
+    assert cli.note_collect_result(st, a, ["ConnectionError: refused"]) == 1 and a.sent == []
+    assert cli.note_collect_result(st, a, ["ConnectionError: refused"]) == 2 and a.sent[0][0] == "error"
+    assert cli.note_collect_result(st, a, ["ConnectionError: refused"]) == 3 and len(a.sent) == 1
+    assert cli.note_collect_result(st, a, []) == 0 and "recuperado" in a.sent[1][1]
+    assert cli.note_collect_result(st, a, []) == 0 and len(a.sent) == 2
+
+
+def test_collect_without_network_logs_and_returns_1(monkeypatch, capsys):
+    def boom(cfg):
+        raise ConnectionError("sin red")
+    monkeypatch.setattr(cli, "_info", boom)
+    assert cli.main(["collect"]) == 1
+    assert "sin red" in capsys.readouterr().out
+    st = cli._store(cli.load_live_config())
+    ev = st.con.execute("SELECT level, kind FROM events WHERE kind='collect'").fetchall()
+    assert [tuple(r) for r in ev] == [("error", "collect")]

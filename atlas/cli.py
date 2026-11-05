@@ -63,16 +63,43 @@ def _market(cfg: dict, info, store: SQLiteStore):
 
 # ---------------------------------------------------------------------------------------------- comandos
 def cmd_collect(args, cfg) -> int:
+    from atlas.alerts import Alerter
     from atlas.data.collectors import collect_all
     with process_lock("collect"):
-        st, info = _store(cfg), _info(cfg)
-        m = _market(cfg, info, st)
-        rep = collect_all(info, st, m.coin, cfg["market"]["perp_coin"])
-        print(json.dumps({"candles": rep.candles, "books_spread_bps": rep.books, "funding": rep.funding,
-                          "errors": rep.errors, "weight_used": info.budget.used()}, indent=1))
-        if args.final:
+        st = _store(cfg)
+        try:
+            info = _info(cfg)
+            m = _market(cfg, info, st)
+            rep = collect_all(info, st, m.coin, cfg["market"]["perp_coin"])
+            errors = rep.errors
+            print(json.dumps({"candles": rep.candles, "books_spread_bps": rep.books, "funding": rep.funding,
+                              "errors": rep.errors, "weight_used": info.budget.used()}, indent=1))
+        except Exception as e:                 # sin red / HL caído: se registra y se alerta, no traceback mudo
+            errors, m = [f"{type(e).__name__}: {e}"], None
+            print(json.dumps({"errors": errors}, indent=1))
+        note_collect_result(st, Alerter(st, cfg["alerts"]["telegram"], cfg["alerts"]["healthchecks"]), errors)
+        if args.final and m is not None:
             _quality_yesterday(cfg, st, m)
-        return 1 if rep.errors else 0
+        return 1 if errors else 0
+
+
+COLLECT_ALERT_STREAK = 2   # corridas horarias seguidas con error antes de avisar (~1 h sin datos)
+
+
+def note_collect_result(st, alerter, errors: list[str]) -> int:
+    """Lleva la racha de fallos del recolector: evento en cada fallo, alerta al llegar a la racha y al recuperarse."""
+    streak = int(st.kv_get("collect_fail_streak") or 0)
+    if errors:
+        streak += 1
+        st.log_event("error", "collect", "; ".join(errors)[:500], {"streak": streak})
+        if streak == COLLECT_ALERT_STREAK:
+            alerter.send(f"RECOLECTOR: {streak} corridas seguidas con error. Último: {errors[0][:200]}", "error")
+    else:
+        if streak >= COLLECT_ALERT_STREAK:
+            alerter.send(f"Recolector recuperado tras {streak} corridas con error (el traslape rellena el hueco)", "info")
+        streak = 0
+    st.kv_set("collect_fail_streak", str(streak))
+    return streak
 
 
 def _quality_yesterday(cfg, st, m) -> None:
