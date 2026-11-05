@@ -80,7 +80,37 @@ def test_stale_data_safe_mode_keeps_position(ctx):
     ctx.clock.t = datetime(2026, 10, 29, 9, 0, tzinfo=timezone.utc)   # última vela 05:15 -> 3.5 h
     s = run_daily(ctx, broker(ctx))
     assert s.status == "safe_mode" and s.trade is None and any("viejos" in b for b in s.blocks)
-    assert ctx.store.ledger_row("paper", "2026-10-28")["ubtc"] == 0
+    assert ctx.store.ledger_row("paper", "2026-10-28") is None          # el día no se cierra
+    assert ctx.store.fills("paper") == []
+
+
+def test_retry_after_safe_mode_trades(ctx):
+    """Simulacro F5: datos viejos -> modo seguro; con datos al día, el reintento sí opera (una sola vez)."""
+    ctx.clock.t = datetime(2026, 10, 29, 9, 0, tzinfo=timezone.utc)
+    assert run_daily(ctx, broker(ctx)).status == "safe_mode"
+    ctx.clock.t = NOW                                                   # equivale a recolectar de nuevo
+    s = run_daily(ctx, broker(ctx))
+    assert s.status == "done" and s.trade["side"] == "buy"
+    assert run_daily(ctx, broker(ctx)).status == "already_done" and len(ctx.store.fills("paper")) == 1
+
+
+def test_crash_mid_execution_no_duplicate(ctx):
+    """Simulacro F5: el proceso muere después de guardar el fill y antes del ledger; el reintento no duplica."""
+    class Boom(Exception):
+        pass
+
+    orig = ctx.store.write_ledger
+
+    def die(*a, **k):
+        raise Boom()
+    ctx.store.write_ledger = die
+    with pytest.raises(Boom):
+        run_daily(ctx, broker(ctx))
+    ctx.store.write_ledger = orig
+    assert len(ctx.store.fills("paper")) == 1 and ctx.store.ledger_row("paper", "2026-10-28") is None
+    s = run_daily(ctx, broker(ctx))
+    assert s.status == "done" and s.trade.get("filled") and len(ctx.store.fills("paper")) == 1
+    assert s.weight_after == pytest.approx(0.75, abs=0.01)
 
 
 def test_kill_switch_sells_even_in_safe_mode(ctx):

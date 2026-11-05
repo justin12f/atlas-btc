@@ -173,6 +173,11 @@ def _run(ctx: Context, broker, mode: str, day: str, now: datetime) -> DailySumma
             state, trade = _execute(ctx, broker, mode, day, plan, market, state, close)
         else:
             trade = {"side": None, "reason": plan.reason}
+    if status == "safe_mode":
+        # No se cierra el día: tras corregir los datos, `atlas daily` puede volver a intentarlo.
+        # Si nadie lo reintenta, al día siguiente se parte del último ledger (la posición se mantuvo).
+        return DailySummary(mode, day, status, target, w_before, w_before, state.equity(mid), None,
+                            risk.blocks, risk.alerts)
     state = roll_peak(state, mid)
     st.write_ledger(mode, day, state.usdc, state.ubtc, mid, state.peak, state.paused, target)
     return DailySummary(mode, day, status, target, w_before, state.weight(mid), state.equity(mid), trade,
