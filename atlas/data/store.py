@@ -243,6 +243,13 @@ class SQLiteStore:
         with self.tx():
             self.con.execute("INSERT INTO runs VALUES (?,?,?,?,?,?)", (run_id, job, utcnow(), None, "running", None))
 
+    def mark_crashed_runs(self, job: str) -> int:
+        """Corridas de `job` que quedaron en 'running' (proceso muerto). Solo se llama con el flock tomado."""
+        with self.tx():
+            cur = self.con.execute("UPDATE runs SET finished_at=?, status='crashed' WHERE job=? AND status='running'",
+                                   (utcnow(), job))
+        return cur.rowcount
+
     def finish_run(self, run_id: str, status: str, error: str | None = None) -> None:
         with self.tx():
             self.con.execute("UPDATE runs SET finished_at=?, status=?, error=? WHERE run_id=?",

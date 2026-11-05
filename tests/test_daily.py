@@ -9,6 +9,7 @@ from atlas.daily import Context, last_complete_day, run_daily
 from atlas.data.collectors import load_fixture_candles
 from atlas.data.store import SQLiteStore
 from atlas.execution.brokers import PaperBroker
+from atlas.hl.markets import cloid_for
 from atlas.interfaces import Fill
 from engine.strategy import load_config
 from tests.conftest import ROOT, load_fx
@@ -128,3 +129,16 @@ def test_market_change_blocks(ctx):
     ctx.store.kv_set(f"market_fp:{UBTC.pair}", "otra-huella")
     s = run_daily(ctx, broker(ctx))
     assert s.status == "safe_mode" and any("spotMeta" in b for b in s.blocks)
+
+
+def test_killed_run_marked_and_order_abandoned(ctx):
+    """Simulacro F5 (SIGKILL durante la espera maker): orden 'working' sin fills y corrida 'running'."""
+    ctx.store.start_run("muerta", "daily:paper")
+    ctx.store.upsert_order(cloid_for("2026-10-28", "paper", 0), "paper", "2026-10-28", "buy", 80_000.0, 0.09,
+                           "maker_first", "working")
+    s = run_daily(ctx, broker(ctx))
+    assert s.status == "done" and len(ctx.store.fills("paper")) == 1
+    st = {o["cloid"]: o["status"] for o in ctx.store.orders("paper", "2026-10-28")}
+    assert st[cloid_for("2026-10-28", "paper", 0)] == "abandoned" and st[cloid_for("2026-10-28", "paper", 1)] == "filled"
+    runs = dict(ctx.store.con.execute("SELECT run_id, status FROM runs").fetchall())
+    assert runs["muerta"] == "crashed"

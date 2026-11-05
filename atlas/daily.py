@@ -105,6 +105,8 @@ def run_daily(ctx: Context, broker, mode: str = "paper") -> DailySummary:
     if st.ledger_row(mode, day):
         return DailySummary(mode, day, "already_done")
     run_id = f"daily-{mode}-{day}-{uuid.uuid4().hex[:8]}"
+    if st.mark_crashed_runs(f"daily:{mode}"):
+        st.log_event("warn", "daily", "corrida anterior murió a mitad (marcada 'crashed'); se reintenta", {"mode": mode, "date": day})
     st.start_run(run_id, f"daily:{mode}")
     try:
         summary = _run(ctx, broker, mode, day, now)
@@ -199,6 +201,10 @@ def _execute(ctx: Context, broker, mode: str, day: str, plan, market: SpotMarket
                               ctx.cfg["risk"]["min_order_usd"])
             if not plan.side:
                 return state, {"side": None, "reason": "completado por fills previos", "recovered": True}
+        if mode != "testnet":                  # simulado: una orden 'working' sin fills es de un proceso muerto
+            for o in prior:
+                if o["status"] == "working" and not st.fills(mode, o["cloid"]):
+                    st.upsert_order(o["cloid"], mode, day, o["side"], o["px"], o["sz"], o["tif"], "abandoned")
         cloid = cloid_for(day, mode, len(prior))
         st.upsert_order(cloid, mode, day, plan.side, plan.ref_px, plan.sz, "maker_first", "working")
         res = broker.execute(plan, market, cloid, ref_close=close)
