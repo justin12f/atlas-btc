@@ -3,9 +3,9 @@
 Todos los comandos como el usuario `atlas`:
 
 ```bash
-sudo -u atlas env $(sudo cat /etc/atlas/atlas.env | xargs) /opt/atlas/.venv/bin/python -m atlas.cli <comando>
+sudo -u atlas env $(sudo grep -v "^\s*#" /etc/atlas/atlas.env | grep = | xargs) /opt/atlas/.venv/bin/python -m atlas.cli <comando>
 # alias sugerido en ~/.bashrc de tu usuario:
-alias atlas='sudo -u atlas env $(sudo cat /etc/atlas/atlas.env | xargs) /opt/atlas/.venv/bin/python -m atlas.cli'
+alias atlas='sudo -u atlas env $(sudo grep -v "^\s*#" /etc/atlas/atlas.env | grep = | xargs) /opt/atlas/.venv/bin/python -m atlas.cli'
 ```
 
 Regla general: **ante datos dudosos Atlas no opera y mantiene la posición** (regla 6). Un día sin operar casi
@@ -20,6 +20,7 @@ nunca cuesta nada; una operación con datos malos sí. No hay prisa.
 | Log de la última corrida diaria | `journalctl -u atlas-daily -n 200 --no-pager` |
 | Log del recolector | `journalctl -u atlas-collect -n 100 --no-pager` |
 | Reporte del día | `ls /var/lib/atlas/reports/daily/` |
+| Sombra G1 (no opera; se escribe tras cada `daily`) | `atlas status` (bloque `shadow_g1`); rellenar faltantes: `atlas shadow-g1` |
 | Eventos en la base | `sqlite3 /var/lib/atlas/data/live/atlas.db "select ts,level,kind,message from events order by id desc limit 20"` |
 
 ## Alertas: síntoma → causa probable → acción
