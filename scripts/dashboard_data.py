@@ -22,7 +22,7 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from atlas.shadow_g1 import G1_KILL_DD, g1_config  # noqa: E402
-from atlas.variants import usdc_yield_equity  # noqa: E402
+from atlas.variants import paper_daily  # noqa: E402
 from engine.portfolio import simulate  # noqa: E402
 from engine.strategy import build_targets, load_config, portfolio_config  # noqa: E402
 
@@ -79,30 +79,12 @@ def yearly(r: pd.DataFrame) -> pd.DataFrame:
     return y.reset_index()
 
 
-def paper(ledger: pd.DataFrame, g1: pd.DataFrame | None = None) -> pd.DataFrame:
-    """ledger: papel de Atlas v3. g1: ledger de la sombra G1 (mismas columnas), opcional."""
-    led = ledger.sort_values("date").reset_index(drop=True)
-    out = pd.DataFrame({"date": led["date"], "day": range(len(led))})
-    out["atlas"] = led["equity"]
-    out["atlas_usdc4"] = usdc_yield_equity(led[["date", "usdc", "equity"]], 0.04).to_numpy()
-    out["btc"] = START * led["close"] / led["close"].iloc[0]
-    out["peso_btc"] = led["ubtc"] * led["mark_px"] / led["equity"]
-    out["objetivo"] = led["target"]
-    if g1 is not None:
-        g = g1.sort_values("date").set_index("date")
-        g4 = usdc_yield_equity(g.reset_index()[["date", "usdc", "equity"]], 0.04)
-        out["g1"] = out["date"].map(g["equity"])
-        out["g1_usdc4"] = out["date"].map(g4)
-        out["g1_peso_btc"] = out["date"].map(g["ubtc"] * g["mark_px"] / g["equity"])
-    return out
-
-
 if __name__ == "__main__":
     src, dst = Path(sys.argv[1]), Path(sys.argv[2])
     dst.mkdir(parents=True, exist_ok=True)
     r, P = backtest_returns()
     g1 = pd.read_csv(sys.argv[3]) if len(sys.argv) > 3 else None
-    paper(pd.read_csv(src), g1).to_csv(dst / "paper_daily.csv", index=False)
+    paper_daily(pd.read_csv(src), g1).to_csv(dst / "paper_daily.csv", index=False)
     cone(r["Atlas v3"]).to_csv(dst / "expected_cone.csv", index=False)
     stats(r, P).to_csv(dst / "backtest_stats.csv", index=False)
     yearly(r).to_csv(dst / "yearly.csv", index=False)

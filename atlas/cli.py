@@ -186,6 +186,8 @@ def cmd_daily(args, cfg) -> int:
             from atlas.shadow import record_shadow
             record_shadow(st, s.date, s.target)
             _record_g1(ctx, st, s.date)
+            from atlas.dashboard_export import export_dashboard
+            export_dashboard(st, data_dir(), ctx.alerter)
         from atlas.reports import daily_report, write_report
         write_report(data_dir() / "reports" / "daily", f"{s.date}-{args.mode}", daily_report(st, args.mode, s.date))
         return 0
@@ -210,6 +212,13 @@ def _record_g1(ctx, st, through: str) -> int:
     except Exception as e:
         st.log_event("warn", "shadow_g1", f"{type(e).__name__}: {e}")
         return 0
+
+
+def cmd_dashboard(args, cfg) -> int:
+    from atlas.dashboard_export import export_dashboard
+    st = _store(cfg)
+    print(export_dashboard(st, data_dir()))
+    return 0
 
 
 def cmd_shadow_g1(args, cfg) -> int:
@@ -356,6 +365,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--pair", default="UBTC/USDC")
     sub.add_parser("status")
     sub.add_parser("shadow-g1")
+    sub.add_parser("dashboard")
     p = sub.add_parser("report")
     p.add_argument("--weekly", action="store_true")
     p.add_argument("--date")
@@ -371,7 +381,7 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
     cfg = load_live_config(args.config)
     fn = {"collect": cmd_collect, "backfill": cmd_backfill, "daily": cmd_daily, "resume": cmd_resume,
-          "ack-market": cmd_ack_market, "status": cmd_status, "shadow-g1": cmd_shadow_g1, "report": cmd_report, "parity": cmd_parity, "replay": cmd_replay}[args.cmd]
+          "ack-market": cmd_ack_market, "status": cmd_status, "shadow-g1": cmd_shadow_g1, "dashboard": cmd_dashboard, "report": cmd_report, "parity": cmd_parity, "replay": cmd_replay}[args.cmd]
     return fn(args, cfg)
 
 

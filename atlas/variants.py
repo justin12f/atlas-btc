@@ -21,3 +21,34 @@ def usdc_yield_equity(ledger: pd.DataFrame, apy: float = 0.04) -> pd.Series:
         out.append(row.equity + pot)
         prev_cash = row.usdc + pot
     return pd.Series(out, index=ledger["date"].to_numpy(), name=f"equity_usdc{apy:.0%}")
+
+
+PAPER_START = 10_000.0
+
+
+def paper_daily(ledger: pd.DataFrame, g1: pd.DataFrame | None = None) -> pd.DataFrame:
+    """ledger: papel de Atlas v3. g1: ledger de la sombra G1 (mismas columnas), opcional."""
+    led = ledger.sort_values("date").reset_index(drop=True)
+    out = pd.DataFrame({"date": led["date"], "day": range(len(led))})
+    out["atlas"] = led["equity"]
+    out["atlas_usdc4"] = usdc_yield_equity(led[["date", "usdc", "equity"]], 0.04).to_numpy()
+    out["btc"] = PAPER_START * led["close"] / led["close"].iloc[0]
+    out["peso_btc"] = led["ubtc"] * led["mark_px"] / led["equity"]
+    out["objetivo"] = led["target"]
+    if g1 is not None:
+        g = g1.sort_values("date").set_index("date")
+        g4 = usdc_yield_equity(g.reset_index()[["date", "usdc", "equity"]], 0.04)
+        out["g1"] = out["date"].map(g["equity"])
+        out["g1_usdc4"] = out["date"].map(g4)
+        out["g1_peso_btc"] = out["date"].map(g["ubtc"] * g["mark_px"] / g["equity"])
+    return out
+
+
+def ledgers_for_dashboard(store) -> tuple[pd.DataFrame, pd.DataFrame | None]:
+    """Ledger del papel (con el cierre de la señal del día) y de la sombra G1, como los espera paper_daily."""
+    q = ("SELECT l.date, l.usdc, l.ubtc, l.mark_px, l.equity, l.target, s.close FROM ledger l "
+         "LEFT JOIN signals s ON s.date = l.date AND s.mode = 'paper' WHERE l.mode = ? ORDER BY l.date")
+    paper = pd.read_sql(q, store.con, params=("paper",))
+    g1 = pd.read_sql(q, store.con, params=("shadow_g1",))
+    paper["close"] = paper["close"].fillna(paper["mark_px"])
+    return paper, (g1 if len(g1) else None)
