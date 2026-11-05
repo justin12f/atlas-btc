@@ -66,3 +66,15 @@ def test_collect_without_network_logs_and_returns_1(monkeypatch, capsys):
     st = cli._store(cli.load_live_config())
     ev = st.con.execute("SELECT level, kind FROM events WHERE kind='collect'").fetchall()
     assert [tuple(r) for r in ev] == [("error", "collect")]
+
+
+def test_record_g1_falla_sin_tumbar(tmp_path):
+    """Sin market_cache la sombra G1 solo registra un evento y devuelve 0."""
+    from types import SimpleNamespace
+
+    from atlas.cli import _record_g1
+    from atlas.data.store import SQLiteStore
+    st = SQLiteStore(tmp_path / "a.db")
+    ctx = SimpleNamespace(cfg={"market": {"spot_pair": "UBTC/USDC"}, "paper": {"initial_usdc": 10000}}, C={})
+    assert _record_g1(ctx, st, "2026-11-04") == 0
+    assert any(e["kind"] == "shadow_g1" for e in st.events(limit=5))

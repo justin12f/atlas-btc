@@ -185,9 +185,44 @@ def cmd_daily(args, cfg) -> int:
         if args.mode == "paper" and s.status != "already_done":
             from atlas.shadow import record_shadow
             record_shadow(st, s.date, s.target)
+            _record_g1(ctx, st, s.date)
         from atlas.reports import daily_report, write_report
         write_report(data_dir() / "reports" / "daily", f"{s.date}-{args.mode}", daily_report(st, args.mode, s.date))
         return 0
+
+
+G1_START = "2026-10-29"     # primer día del papel: la sombra arranca con el mismo capital y fecha
+
+
+def _record_g1(ctx, st, through: str) -> int:
+    """Sombra G1 (no opera). Cualquier falla queda como evento y nunca afecta la corrida del papel."""
+    try:
+        from atlas.daily import build_series
+        from atlas.interfaces import SpotMarket
+        from atlas.shadow_g1 import record_g1
+        cached = st.kv_get(f"market_cache:{ctx.cfg['market']['spot_pair']}")
+        if not cached:
+            raise RuntimeError("sin market_cache (aún no corrió daily)")
+        market = SpotMarket(**json.loads(cached))
+        d = build_series(ctx, market, pd.Timestamp.now("UTC").to_pydatetime())
+        return record_g1(st, d, ctx.C, G1_START, through,
+                         ctx.cfg["paper"]["initial_usdc"])
+    except Exception as e:
+        st.log_event("warn", "shadow_g1", f"{type(e).__name__}: {e}")
+        return 0
+
+
+def cmd_shadow_g1(args, cfg) -> int:
+    st = _store(cfg)
+    last = st.last_ledger("paper")
+    if not last:
+        print("no hay ledger del papel")
+        return 0
+    n = _record_g1(_context(cfg, st), st, last["date"])
+    r = st.last_ledger("shadow_g1")
+    print(json.dumps({"dias_escritos": n, "ultimo": r and {k: r[k] for k in ("date", "equity", "weight", "target", "paused")}},
+                     indent=1, default=str))
+    return 0
 
 
 def _testnet_broker(cfg):
@@ -242,7 +277,7 @@ def cmd_status(args, cfg) -> int:
     for r in st.con.execute("SELECT coin, interval, COUNT(*), MIN(t), MAX(t) FROM candles GROUP BY coin, interval"):
         out["candles"][f"{r[0]}/{r[1]}"] = {"n": r[2], "from": str(pd.Timestamp(r[3], unit="ms")),
                                            "to": str(pd.Timestamp(r[4], unit="ms"))}
-    for mode in ("paper", "testnet", "fake"):
+    for mode in ("paper", "shadow_g1", "testnet", "fake"):
         last = st.last_ledger(mode)
         if last:
             out[mode] = {k: last[k] for k in ("date", "equity", "weight", "drawdown", "paused", "target")}
@@ -320,6 +355,7 @@ def main(argv: list[str] | None = None) -> int:
     p = sub.add_parser("ack-market")
     p.add_argument("--pair", default="UBTC/USDC")
     sub.add_parser("status")
+    sub.add_parser("shadow-g1")
     p = sub.add_parser("report")
     p.add_argument("--weekly", action="store_true")
     p.add_argument("--date")
@@ -335,7 +371,7 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
     cfg = load_live_config(args.config)
     fn = {"collect": cmd_collect, "backfill": cmd_backfill, "daily": cmd_daily, "resume": cmd_resume,
-          "ack-market": cmd_ack_market, "status": cmd_status, "report": cmd_report, "parity": cmd_parity, "replay": cmd_replay}[args.cmd]
+          "ack-market": cmd_ack_market, "status": cmd_status, "shadow-g1": cmd_shadow_g1, "report": cmd_report, "parity": cmd_parity, "replay": cmd_replay}[args.cmd]
     return fn(args, cfg)
 
 
