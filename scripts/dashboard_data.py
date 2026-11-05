@@ -1,7 +1,7 @@
 """
 Datos del tablero "Atlas vs lo esperado" (solo lectura: no toca engine/, config ni el ledger).
 
-  python scripts/dashboard_data.py ledger_paper.csv carpeta_salida/
+  python scripts/dashboard_data.py ledger_paper.csv carpeta_salida/ [ledger_shadow_g1.csv]
 
 ledger_paper.csv: export del ledger del papel (date, usdc, ubtc, mark_px, equity, target, close).
 Escribe:
@@ -21,6 +21,7 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+from atlas.shadow_g1 import G1_KILL_DD, g1_config  # noqa: E402
 from atlas.variants import usdc_yield_equity  # noqa: E402
 from engine.portfolio import simulate  # noqa: E402
 from engine.strategy import build_targets, load_config, portfolio_config  # noqa: E402
@@ -37,6 +38,10 @@ def backtest_returns() -> tuple[pd.DataFrame, dict]:
     for name, pc in {"Atlas v3": portfolio_config(C), "Atlas v3 + USDC 4%": portfolio_config(C, usdc_apy=0.04)}.items():
         tg = build_targets(d, None, C, pc)
         out[name] = simulate(d, tg["target"], pc, P["dev_start"], P["holdout_end"])["ret"]
+    G = g1_config(C)
+    for name, apy in {"G1 sin freno de vol": 0.0, "G1 + USDC 4%": 0.04}.items():
+        pc = portfolio_config(G, usdc_apy=apy, kill_dd=G1_KILL_DD)
+        out[name] = simulate(d, build_targets(d, None, G, pc)["target"], pc, P["dev_start"], P["holdout_end"])["ret"]
     r = pd.DataFrame(out)
     r["BTC comprado y mantenido"] = d["close"].pct_change().reindex(r.index)
     return r, P
@@ -74,7 +79,8 @@ def yearly(r: pd.DataFrame) -> pd.DataFrame:
     return y.reset_index()
 
 
-def paper(ledger: pd.DataFrame) -> pd.DataFrame:
+def paper(ledger: pd.DataFrame, g1: pd.DataFrame | None = None) -> pd.DataFrame:
+    """ledger: papel de Atlas v3. g1: ledger de la sombra G1 (mismas columnas), opcional."""
     led = ledger.sort_values("date").reset_index(drop=True)
     out = pd.DataFrame({"date": led["date"], "day": range(len(led))})
     out["atlas"] = led["equity"]
@@ -82,6 +88,12 @@ def paper(ledger: pd.DataFrame) -> pd.DataFrame:
     out["btc"] = START * led["close"] / led["close"].iloc[0]
     out["peso_btc"] = led["ubtc"] * led["mark_px"] / led["equity"]
     out["objetivo"] = led["target"]
+    if g1 is not None:
+        g = g1.sort_values("date").set_index("date")
+        g4 = usdc_yield_equity(g.reset_index()[["date", "usdc", "equity"]], 0.04)
+        out["g1"] = out["date"].map(g["equity"])
+        out["g1_usdc4"] = out["date"].map(g4)
+        out["g1_peso_btc"] = out["date"].map(g["ubtc"] * g["mark_px"] / g["equity"])
     return out
 
 
@@ -89,7 +101,8 @@ if __name__ == "__main__":
     src, dst = Path(sys.argv[1]), Path(sys.argv[2])
     dst.mkdir(parents=True, exist_ok=True)
     r, P = backtest_returns()
-    paper(pd.read_csv(src)).to_csv(dst / "paper_daily.csv", index=False)
+    g1 = pd.read_csv(sys.argv[3]) if len(sys.argv) > 3 else None
+    paper(pd.read_csv(src), g1).to_csv(dst / "paper_daily.csv", index=False)
     cone(r["Atlas v3"]).to_csv(dst / "expected_cone.csv", index=False)
     stats(r, P).to_csv(dst / "backtest_stats.csv", index=False)
     yearly(r).to_csv(dst / "yearly.csv", index=False)

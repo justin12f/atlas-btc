@@ -19,3 +19,20 @@ def test_fully_invested_earns_nothing():
 def test_half_cash_half_rate():
     led = pd.DataFrame({"date": ["a", "b"], "usdc": [5_000.0, 5_000.0], "equity": [10_000.0, 10_000.0]})
     assert usdc_yield_equity(led).iloc[1] - 10_000 == pytest.approx(5_000 * (1.04 ** (1 / 365) - 1))
+
+
+def test_dashboard_paper_con_g1():
+    import importlib.util
+    from pathlib import Path
+    p = Path(__file__).resolve().parents[1] / "scripts/dashboard_data.py"
+    spec = importlib.util.spec_from_file_location("dd", p)
+    dd = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(dd)
+    led = pd.DataFrame({"date": ["2026-10-29", "2026-10-30"], "usdc": [5000.0, 5000.0], "ubtc": [0.05, 0.05],
+                        "mark_px": [100_000.0, 102_000.0], "equity": [10_000.0, 10_100.0], "target": [0.5, 0.5],
+                        "close": [100_000.0, 102_000.0]})
+    g1 = led.drop(columns=["close", "target"]).assign(equity=[10_000.0, 10_200.0])
+    out = dd.paper(led, g1)
+    assert list(out["g1"]) == [10_000.0, 10_200.0]
+    assert out["g1_usdc4"].iloc[1] > out["g1"].iloc[1]
+    assert out["g1_peso_btc"].iloc[0] == pytest.approx(0.5)
